@@ -51,9 +51,9 @@ extract_data_from_csv = BashOperator(
     delimited by a '\t'
 """
 extract_data_from_tsv = BashOperator(
-    task_id = 'extract_data_from_tsv',                                                  # task id
-    bash_command = "cut -d$'\t' -f5,6,7 raw-data/tollplaza-data.tsv > tsv_data.csv",    # task command
-    dag = dag                                                                           # attached dag
+    task_id = 'extract_data_from_tsv',                                                                # task id
+    bash_command = "cut -d$'\t' -f5,6,7 raw-data/tollplaza-data.tsv | tr '\t' ',' > tsv_data.csv",    # task command
+    dag = dag                                                                                         # attached dag
 )
 
 """
@@ -63,7 +63,18 @@ extract_data_from_tsv = BashOperator(
     where each field occupies a fixed number os characters
 """
 extract_data_from_fixed_width = BashOperator(
-    task_id = 'extract_data_from_fixed_width',
-    bash_command = 'cut -c59-67 raw-data/payment-data.txt | tr " " "," > fixed_width_data.csv'
+    task_id = 'extract_data_from_fixed_width',                                                  # task id
+    bash_command = 'cut -c59-67 raw-data/payment-data.txt | tr " " "," > fixed_width_data.csv'  # task command
+    dag = dag                                                                                   # attached dag
 )
+
+"""
+    Use paste command in order to get unified csv_data.csv, tsv_data.csv and fixed_width_data.csv
+    using comma as a delimiter
+"""
+consolidate_data = BashOperator(
+    task_id = 'consolidate_data',                                                                   # task id
+    bash_command = 'paste -d"," csv_data.csv tsv_data.cs fixed_width_data.csv>extracted_data.csv'   # task command
+    dag = dag                                                                                       # attached dag
+)  
 extract >> transform_and_load
