@@ -37,9 +37,22 @@ unzip_data = BashOperator(
         - Vechile type (col 4)
     delimited by a ','
 """
-extract = BashOperator(
+extract_data_from_csv = BashOperator(
     task_id = 'extract_data_from_csv',                                                  # task id
     bash_command = 'cut -d"," -f1,2,3,4 raw-data/vehicle-data.csv > csv_data.csv',    # task command
+    dag = dag                                                                           # attached dag
+)
+
+"""
+    Use cut command in order to get
+        - Number of axles (col 5),
+        - Tollplaza id (col 6),
+        - Tollplaza code (col 7),
+    delimited by a '\t'
+"""
+extract_data_from_tsv = BashOperator(
+    task_id = 'extract_data_from_tsv',                                                  # task id
+    bash_command = "cut -d$'\t' -f5,6,7 raw-data/tollplaza-data.tsv",                   # task command
     dag = dag                                                                           # attached dag
 )
 
