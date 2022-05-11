@@ -37,7 +37,7 @@ unzip_data = BashOperator(
         - RowID (col 1),
         - Timestamp (col 2),
         - Anonymized Vehicle Number (col 3),
-        - Vechile type (col 4)
+        - Vehicle type (col 4)
     delimited by a ','
 """
 extract_data_from_csv = BashOperator(
