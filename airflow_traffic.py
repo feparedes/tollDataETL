@@ -52,8 +52,18 @@ extract_data_from_csv = BashOperator(
 """
 extract_data_from_tsv = BashOperator(
     task_id = 'extract_data_from_tsv',                                                  # task id
-    bash_command = "cut -d$'\t' -f5,6,7 raw-data/tollplaza-data.tsv",                   # task command
+    bash_command = "cut -d$'\t' -f5,6,7 raw-data/tollplaza-data.tsv > tsv_data.csv",    # task command
     dag = dag                                                                           # attached dag
 )
 
+"""
+    Use cut command in order to get
+        - Types of payments code (characters 59-61),
+        - Vehicle Code (characters 62-69)
+    where each field occupies a fixed number os characters
+"""
+extract_data_from_fixed_width = BashOperator(
+    task_id = 'extract_data_from_fixed_width',
+    bash_command = 'cut -c59-67 raw-data/payment-data.txt | tr " " "," > fixed_width_data.csv'
+)
 extract >> transform_and_load
