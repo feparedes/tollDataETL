@@ -76,5 +76,14 @@ consolidate_data = BashOperator(
     task_id = 'consolidate_data',                                                                   # task id
     bash_command = 'paste -d"," csv_data.csv tsv_data.cs fixed_width_data.csv>extracted_data.csv'   # task command
     dag = dag                                                                                       # attached dag
-)  
-extract >> transform_and_load
+)
+
+"""
+    Transform data setting to upper case vehicle_type field and save it into a filed names transform_data.csv
+"""
+transform_data = BashOperator(
+    task_id = 'transform_data',                                                         # task id
+    bash_command = 'tr [:lower:] [:upper:] < extracted_data.csv > transform_data.csv'   # task command
+    dag = dag                                                                           # attached dag
+)
+
