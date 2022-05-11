@@ -5,6 +5,9 @@ from airflow import DAG
 from airflow.operators.bash_operator import BashOperator
 from airflow.utils.dates import days_ago
 
+# We define below the data path
+DATA_PATH = '~/Data/TollData/raw-data/'
+
 # We define Airflow DAG arguments
 default_args = {
     'owner': 'feparedes',
@@ -25,7 +28,7 @@ dag = DAG(
 
 unzip_data = BashOperator(
     task_id = 'unzip_data',                                   # task id
-    bash_command = 'tar -xf tolldata.tgz -C ./raw-data',      # task command
+    bash_command = 'cd '+DATA_PATH+' && tar -xf ../tolldata.tgz -C ./',      # task command
     dag = dag                                                 # attached dag
 )
 
@@ -39,7 +42,7 @@ unzip_data = BashOperator(
 """
 extract_data_from_csv = BashOperator(
     task_id = 'extract_data_from_csv',                                                  # task id
-    bash_command = 'cut -d"," -f1,2,3,4 raw-data/vehicle-data.csv > csv_data.csv',    # task command
+    bash_command = 'cut -d"," -f1,2,3,4 '+DATA_PATH+'vehicle-data.csv > '+DATA_PATH+'csv_data.csv',    # task command
     dag = dag                                                                           # attached dag
 )
 
@@ -52,7 +55,7 @@ extract_data_from_csv = BashOperator(
 """
 extract_data_from_tsv = BashOperator(
     task_id = 'extract_data_from_tsv',                                                                # task id
-    bash_command = "cut -d$'\t' -f5,6,7 raw-data/tollplaza-data.tsv | tr '\t' ',' > tsv_data.csv",    # task command
+    bash_command = "cut -d$'\t' -f5,6,7 "+DATA_PATH+"tollplaza-data.tsv | tr '\t' ',' > "+DATA_PATH+"tsv_data.csv",    # task command
     dag = dag                                                                                         # attached dag
 )
 
@@ -64,7 +67,7 @@ extract_data_from_tsv = BashOperator(
 """
 extract_data_from_fixed_width = BashOperator(
     task_id = 'extract_data_from_fixed_width',                                                  # task id
-    bash_command = 'cut -c59-67 raw-data/payment-data.txt | tr " " "," > fixed_width_data.csv'  # task command
+    bash_command = 'cut -c59-67 '+DATA_PATH+'payment-data.txt | tr " " "," > '+DATA_PATH+'fixed_width_data.csv',  # task command
     dag = dag                                                                                   # attached dag
 )
 
@@ -74,7 +77,7 @@ extract_data_from_fixed_width = BashOperator(
 """
 consolidate_data = BashOperator(
     task_id = 'consolidate_data',                                                                   # task id
-    bash_command = 'paste -d"," csv_data.csv tsv_data.cs fixed_width_data.csv>extracted_data.csv'   # task command
+    bash_command = 'paste -d"," '+DATA_PATH+'csv_data.csv '+DATA_PATH+'tsv_data.csv '+DATA_PATH+'fixed_width_data.csv > '+DATA_PATH+'extracted_data.csv',   # task command
     dag = dag                                                                                       # attached dag
 )
 
@@ -83,7 +86,7 @@ consolidate_data = BashOperator(
 """
 transform_data = BashOperator(
     task_id = 'transform_data',                                                         # task id
-    bash_command = 'tr [:lower:] [:upper:] < extracted_data.csv > transform_data.csv'   # task command
+    bash_command = 'tr [:lower:] [:upper:] < '+DATA_PATH+'extracted_data.csv > '+DATA_PATH+'transform_data.csv',   # task command
     dag = dag                                                                           # attached dag
 )
 
