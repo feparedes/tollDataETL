@@ -24,15 +24,23 @@ dag = DAG(
 )
 
 unzip_data = BashOperator(
-    task_id = 'unzip_data',
-    bash_command = 'tar -xf tolldata.tgz -C ./raw-data',
-    dag = dag
+    task_id = 'unzip_data',                                   # task id
+    bash_command = 'tar -xf tolldata.tgz -C ./raw-data',      # task command
+    dag = dag                                                 # attached dag
 )
 
-transform_and_load = BashOperator(
-    task_id = 'transform',
-    bash_command = 'tr ":" "," < /home/feemjo/data/extracted-data.txt > /home/feemjo/data/transformed-data.csv',
-    dag = dag
+"""
+    Use cut command in order to get
+        - RowID (col 1),
+        - Timestamp (col 2),
+        - Anonymized Vehicle Number (col 3),
+        - Vechile type (col 4)
+    delimited by a ','
+"""
+extract = BashOperator(
+    task_id = 'extract_data_from_csv',                                                  # task id
+    bash_command = 'cut -d"," -f1,2,3,4 raw-data/vehicle-data.csv > csv_data.csv',    # task command
+    dag = dag                                                                           # attached dag
 )
 
 extract >> transform_and_load
