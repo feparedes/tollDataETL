@@ -87,3 +87,4 @@ transform_data = BashOperator(
     dag = dag                                                                           # attached dag
 )
 
+unzip_data >> extract_data_from_csv >> extract_data_from_tsv >> extract_data_from_fixed_width >> consolidate_data >> transform_data
